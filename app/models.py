@@ -32,7 +32,7 @@ class SpimexTradingResultAsync(Base):
 
     pk_spimex_id: int = Column(
         Integer, primary_key=True, index=True,
-        comment="Уникальный идентификатор записи"
+        comment="Уникальный идентификатор записи", autoincrement=True
     )
     exchange_product_id: str = Column(
         String, nullable=False, comment="Идентификатор биржевого продукта"

@@ -7,3 +7,8 @@ aioredis
 pydantic 
 pydantic_settings
 python-dotenv
+pytest
+pytest-asyncio
+pytest-mock
+httpx
+aiosqlite
