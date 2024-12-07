@@ -1,13 +1,21 @@
 # tests/test_mock.py
 
+from unittest.mock import Mock
+from httpx import AsyncClient
 import pytest
+from typing import List
 from app import schemas
 
 
 @pytest.mark.asyncio
-async def test_get_dynamics_mocked(crud_mock, client):
+async def test_get_dynamics_mocked(crud_mock: Mock, client: AsyncClient) -> None:
+    """
+    Тестирует эндпоинт `/get_dynamics` с использованием мокированной функции `get_dynamics`.
+
+    Мокаем функцию `get_dynamics`, чтобы она возвращала предопределённые данные, и проверяем корректность ответа эндпоинта.
+    """
     # Настройка мок-функции с использованием mocker
-    mock_trading_results = [
+    mock_trading_results: List[schemas.TradingResult] = [
         schemas.TradingResult(
             exchange_product_id="A592VLA060F",
             exchange_product_name="Бензин (АИ-92-К5) по ГОСТ, ст. Ветласян (ст. отправления)",
@@ -24,12 +32,11 @@ async def test_get_dynamics_mocked(crud_mock, client):
             updated_on="2024-11-27T15:39:28.633005"
         )
     ]
-    # Убедитесь, что правильно мокируете функцию
     crud_mock.return_value = mock_trading_results
 
     # Отправка запроса к эндпоинту
     response = await client.get("/get_dynamics?oil_id=A592")
     assert response.status_code == 200
-    data = response.json()
+    data: List[dict] = response.json()
     assert len(data) == 1
     assert data[0]["exchange_product_id"] == "A592VLA060F"

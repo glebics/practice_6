@@ -1,12 +1,20 @@
 # tests/test_endpoints.py
 
+from httpx import AsyncClient
 import pytest
 from datetime import datetime, timedelta
+from typing import List
+from sqlalchemy.ext.asyncio import AsyncSession
 from app import models
 
 
 @pytest.mark.asyncio
-async def test_get_last_trading_dates(client, db_session):
+async def test_get_last_trading_dates(client: AsyncClient, db_session: AsyncSession) -> None:
+    """
+    Тестирует эндпоинт `/get_last_trading_dates` для получения последних торговых дат.
+
+    Создаёт 5 записей и проверяет, что эндпоинт возвращает корректное количество последних дат.
+    """
     # Подготовка данных
     now = datetime.utcnow()
     trading_dates = [
@@ -32,15 +40,20 @@ async def test_get_last_trading_dates(client, db_session):
     # Отправка запроса к эндпоинту
     response = await client.get("/get_last_trading_dates?limit=3")
     assert response.status_code == 200
-    data = response.json()
+    data: List[str] = response.json()
     assert len(data) == 3
-    expected_dates = [(now - timedelta(days=i)).date().isoformat()
-                      for i in range(3)]
+    expected_dates: List[str] = [
+        (now - timedelta(days=i)).date().isoformat() for i in range(3)]
     assert data == expected_dates
 
 
 @pytest.mark.asyncio
-async def test_get_dynamics(client, db_session):
+async def test_get_dynamics(client: AsyncClient, db_session: AsyncSession) -> None:
+    """
+    Тестирует эндпоинт `/get_dynamics` с применением фильтров `oil_id` и `delivery_type_id`.
+
+    Создаёт 5 записей и проверяет, что эндпоинт возвращает корректные записи, соответствующие фильтрам.
+    """
     # Подготовка данных
     trading_results = [
         models.SpimexTradingResultAsync(
@@ -66,7 +79,7 @@ async def test_get_dynamics(client, db_session):
     # Отправка запроса к эндпоинту с фильтрами
     response = await client.get("/get_dynamics?oil_id=A1&delivery_type_id=D1")
     assert response.status_code == 200
-    data = response.json()
+    data: List[dict] = response.json()
     assert len(data) == 5
     for item in data:
         assert item["oil_id"] == "A1"
@@ -74,7 +87,12 @@ async def test_get_dynamics(client, db_session):
 
 
 @pytest.mark.asyncio
-async def test_get_trading_results(client, db_session):
+async def test_get_trading_results(client: AsyncClient, db_session: AsyncSession) -> None:
+    """
+    Тестирует эндпоинт `/get_trading_results` с применением фильтров `oil_id` и `limit`.
+
+    Создаёт 10 записей и проверяет, что эндпоинт возвращает корректное количество записей, соответствующих фильтрам.
+    """
     # Подготовка данных
     trading_results = [
         models.SpimexTradingResultAsync(
@@ -100,7 +118,7 @@ async def test_get_trading_results(client, db_session):
     # Отправка запроса к эндпоинту с фильтрами и лимитом
     response = await client.get("/get_trading_results?oil_id=A1&limit=5")
     assert response.status_code == 200
-    data = response.json()
+    data: List[dict] = response.json()
     assert len(data) == 5
     for item in data:
         assert item["oil_id"] == "A1"
