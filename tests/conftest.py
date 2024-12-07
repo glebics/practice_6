@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from app.main import app
 from app.database import Base, get_db
+from httpx import AsyncClient, ASGITransport
 
 DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
@@ -46,7 +47,7 @@ def override_get_db(db_session):
 
 @pytest.fixture
 async def client(override_get_db):
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
 
 
