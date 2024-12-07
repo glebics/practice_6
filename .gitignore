@@ -16,3 +16,5 @@ __pycache__/
 /.mypy_cache
 .mypy_cache
 /reports
+.pytest_cache
+/.pytest_cache

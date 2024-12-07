@@ -180,9 +180,9 @@ async def get_dynamics(
     logger.info(
         f"Получены торговые результаты из базы данных: {trading_results}")
     # Преобразование объектов модели в Pydantic схемы
-    results = [schemas.TradingResult.from_orm(tr) for tr in trading_results]
+    results = [schemas.TradingResult.model_validate(tr) for tr in trading_results]
     # Преобразование Pydantic схем в словари для кэширования
-    results_dict = [result.dict() for result in results]
+    results_dict = [result.model_dump() for result in results]
     await set_cache(cache_key, results_dict, expire=get_seconds_until_flush())
     logger.info(f"Кэш установлен для ключа {cache_key}")
     return results
@@ -248,9 +248,9 @@ async def get_trading_results(
     logger.info(
         f"Получены торговые результаты из базы данных: {trading_results}")
     # Преобразование объектов модели в Pydantic схемы
-    results = [schemas.TradingResult.from_orm(tr) for tr in trading_results]
+    results = [schemas.TradingResult.model_validate(tr) for tr in trading_results]
     # Преобразование Pydantic схем в словари для кэширования
-    results_dict = [result.dict() for result in results]
+    results_dict = [result.model_dump() for result in results]
     await set_cache(cache_key, results_dict, expire=get_seconds_until_flush())
     logger.info(f"Кэш установлен для ключа {cache_key}")
     return results
